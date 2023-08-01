@@ -52,7 +52,8 @@ type testStruct struct {
 		"stringColumn":     {"nullable": "NO", "value": "varchar"},
 		"nullStringColumn": {"nullable": "YES", "value": "varchar"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	columnsSorted := []string{"stringColumn", "nullStringColumn"}
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -90,7 +91,19 @@ type testStruct struct {
 		"varbinaryColumn":      {"nullable": "NO", "value": "varbinary"},
 		"nullVarbinaryColumn":  {"nullable": "YES", "value": "varbinary"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	columnsSorted := []string{
+		"binaryColumn",
+		"nullBinaryColumn",
+		"blobColumn",
+		"nullBlobColumn",
+		"longBlobColumn",
+		"nullLongBlobColumn",
+		"mediumBlobColumn",
+		"nullMediumBlobColumn",
+		"varbinaryColumn",
+		"nullVarbinaryColumn"}
+
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -124,8 +137,17 @@ type testStruct struct {
 	NullTimeStampColumn time.Time
 }
 `
+	columnsSorted := []string{
+		"DateColumn",
+		"DateTimeColumn",
+		"TimeColumn",
+		"TimeStampColumn",
+		"NullDateColumn",
+		"NullDateTimeColumn",
+		"NullTimeColumn",
+		"NullTimeStampColumn"}
 
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -146,8 +168,7 @@ type testStruct struct {
 	NullTimeStampColumn null.Time
 }
 `
-
-	bytes, err = Generate(columnMap, "test_table", "testStruct", "test", false, false, true)
+	bytes, err = Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, true)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -178,8 +199,15 @@ type testStruct struct {
 	NullFloatColumn   sql.NullFloat64
 }
 `
+	columnsSorted := []string{
+		"DecimalColumn",
+		"DoubleColumn",
+		"FloatColumn",
+		"NullDecimalColumn",
+		"NullDoubleColumn",
+		"NullFloatColumn"}
 
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -199,7 +227,7 @@ type testStruct struct {
 }
 `
 
-	bytes, err = Generate(columnMap, "test_table", "testStruct", "test", false, false, true)
+	bytes, err = Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, true)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -238,7 +266,20 @@ type testStruct struct {
 }
 `
 
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	columnsSorted := []string{
+		"BigIntColumn",
+		"IntColumn",
+		"MediumIntColumn",
+		"NullBigIntColumn",
+		"NullIntColumn",
+		"NullMediumIntColumn",
+		"NullSmallIntColumn",
+		"NullTinyIntColumn",
+		"SmallIntColumn",
+		"TinyIntColumn",
+	}
+
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, false, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -262,7 +303,7 @@ type testStruct struct {
 }
 `
 
-	bytes, err = Generate(columnMap, "test_table", "testStruct", "test", false, false, true)
+	bytes, err = Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, false, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -280,12 +321,15 @@ func TestMysqlJSONStringGenerate(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	NullStringColumn sql.NullString ` + "`json:\"nullStringColumn\"`" + `
-	StringColumn     string         ` + "`json:\"stringColumn\"`" + `
+	StringColumn     string         ` + "`json:\"stringColumn\" comment:\"\"`     //" + `
+	NullStringColumn sql.NullString ` + "`json:\"nullStringColumn\" comment:\"\"` //" + `
 }
 `
+	columnsSorted := []string{
+		"stringColumn",
+		"nullStringColumn"}
 
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", true, false, false)
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", true, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -298,8 +342,8 @@ func TestMysqlGormStringGenerate(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	NullStringColumn sql.NullString ` + "`gorm:\"column:nullStringColumn\"`" + `
-	StringColumn     string         ` + "`gorm:\"column:stringColumn\"`" + `
+	StringColumn     string         ` + "`gorm:\"column:stringColumn\" comment:\"\"`     //" + `
+	NullStringColumn sql.NullString ` + "`gorm:\"column:nullStringColumn\" comment:\"\"` //" + `
 }
 
 // TableName sets the insert table name for this struct type
@@ -312,7 +356,13 @@ func (t *testStruct) TableName() string {
 		"stringColumn":     {"nullable": "NO", "value": "varchar"},
 		"nullStringColumn": {"nullable": "YES", "value": "varchar"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, true, false)
+
+	columnsSorted := []string{
+		"stringColumn",
+		"nullStringColumn",
+	}
+
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, true, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -325,14 +375,18 @@ func TestMysqlStringWithIntGenerate(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	OneStringColumn string
+	OneStringColumn string ` + "`comment:\"\"` //" + `
 }
 `
 
 	columnMap := map[string]map[string]string{
 		"1stringColumn": {"nullable": "NO", "value": "varchar"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+
+	columnsSorted := []string{
+		"1stringColumn",
+	}
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -345,14 +399,17 @@ func TestMysqlStringWithUnderscoresGenerate(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	StringColumn string
+	OneStringColumn ` + "`comment:\"\"` //" + `
 }
 `
 
 	columnMap := map[string]map[string]string{
 		"string_Column": {"nullable": "NO", "value": "varchar"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	columnsSorted := []string{
+		"1stringColumn",
+	}
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -365,14 +422,17 @@ func TestMysqlStringWithCommonInitialismGenerate(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	API string
+	API string ` + "`comment:\"\"` //" + `
 }
 `
 
 	columnMap := map[string]map[string]string{
 		"API": {"nullable": "NO", "value": "varchar"},
 	}
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, false)
+	columnsSorted := []string{
+		"API",
+	}
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, false)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
@@ -386,17 +446,17 @@ func TestMysqlTypeToGureguType(t *testing.T) {
 		`package test
 
 type testStruct struct {
-	BigInt    int64
-	Date      null.Time
-	DateTime  null.Time
-	Decimal   null.Float
-	Double    float64
-	Float     null.Float
-	Int       null.Int
-	Time      time.Time
-	TimeStamp null.Time
-	TinyInt   int
-	VarChar   null.String
+	VarChar   null.String ` + "`comment:\"\"` //" + `
+	TinyInt   int         ` + "`comment:\"\"` //" + `
+	Int       null.Int    ` + "`comment:\"\"` //" + `
+	BigInt    int64       ` + "`comment:\"\"` //" + `
+	Decimal   null.Float  ` + "`comment:\"\"` //" + `
+	Float     null.Float  ` + "`comment:\"\"` //" + `
+	Double    float64     ` + "`comment:\"\"` //" + `
+	DateTime  null.Time   ` + "`comment:\"\"` //" + `
+	Time      time.Time   ` + "`comment:\"\"` //" + `
+	Date      null.Time   ` + "`comment:\"\"` //" + `
+	TimeStamp null.Time   ` + "`comment:\"\"` //" + `
 }
 `
 
@@ -414,7 +474,20 @@ type testStruct struct {
 		"TimeStamp": {"nullable": "YES", "value": "timestamp"},
 	}
 
-	bytes, err := Generate(columnMap, "test_table", "testStruct", "test", false, false, true)
+	columnsSorted := []string{
+		"VarChar",
+		"TinyInt",
+		"Int",
+		"BigInt",
+		"Decimal",
+		"Float",
+		"Double",
+		"DateTime",
+		"Time",
+		"Date",
+		"TimeStamp",
+	}
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, true, true)
 
 	Convey("Should be able to generate map for guregu types", t, func() {
 		So(err, ShouldBeNil)
