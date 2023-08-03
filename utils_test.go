@@ -279,7 +279,7 @@ type testStruct struct {
 		"TinyIntColumn",
 	}
 
-	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, false, false)
+	bytes, err := Generate(columnMap, columnsSorted, "test_table", "testStruct", "test", false, false, false, true)
 
 	Convey("Should be able to generate map from string column", t, func() {
 		So(err, ShouldBeNil)
